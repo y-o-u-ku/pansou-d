@@ -1,15 +1,17 @@
-# 使用 pansou 官方镜像
+# ✅ 使用官方镜像作为基础镜像
 FROM ghcr.io/fish2018/pansou-web:latest
 
-# 设置环境变量（启用插件）
-ENV ENABLED_PLUGINS="labi,zhizhen,shandian,duoduo,muou,wanou"
+# ✅ 设置 Railway 环境变量（Railway 自动注入 $PORT）
+ENV DOMAIN=railway.app
+ENV PANSOU_PORT=8888
+ENV PANSOU_HOST=127.0.0.1
+ENV ENABLED_PLUGINS=labi,zhizhen,shandian,duoduo,muou,wanou
+ENV HEALTH_CHECK_INTERVAL=30
+ENV HEALTH_CHECK_TIMEOUT=10
+ENV HEALTH_CHECK_RETRIES=3
 
-# Railway 会自动注入 PORT 环境变量，比如 12345
-# 如果没有，就默认 8080
-ENV PORT=8080
+# ✅ Railway 容器暴露的端口（Railway 仅映射此端口）
+EXPOSE 80
 
-# 暴露端口（只是声明）
-EXPOSE 8080
-
-# 使用 shell 执行，以便在运行时识别 $PORT
-CMD ["sh", "-c", "./pansou-web --port=${PORT}"]
+# ✅ 保留镜像原始 ENTRYPOINT，只重写 CMD（防止丢失 /app/start.sh）
+CMD ["sh", "-c", "/app/start.sh && tail -f /app/data/logs/backend/pansou.log"]
